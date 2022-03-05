@@ -61,25 +61,23 @@ def index():
 @user_secret_decrypted_required
 def set_api_key():
     if request.method == "POST":
-        client_id = request.form.get("client_id")
-        client_secret = request.form.get("client_secret")
+        api_token = request.form.get("api_token")
         BitcoinReserveService.set_api_credentials(
             user=app.specter.user_manager.get_user(),
-            client_id=client_id,
-            client_secret=client_secret,
+            api_token=api_token,
         )
 
         try:
-            BitcoinReserveService.update()
+            # BitcoinReserveService.update()
             return redirect(
-                url_for(f"{BitcoinReserveService.get_blueprint_name()}.history")
+                url_for(f"{BitcoinReserveService.get_blueprint_name()}.transactions")
             )
         except BitcoinReserveApiException as e:
             logger.debug(repr(e))
-            flash(_("Error: {e}"), category="error")
+            flash(f"Error: {e}", category="error")
 
     return render_template(
-        "bitcoinreserve/set_api_key.jinja",
+        "bitcoinreserve/set_api_token.jinja",
     )
 
 

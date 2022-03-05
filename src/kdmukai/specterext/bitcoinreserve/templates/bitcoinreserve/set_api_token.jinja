@@ -59,19 +59,16 @@
         <div class="instructions">
             <div class="show_list_bullet">
                 <li>{{ _("Sign into your Bitcoin Reserve account") }}</li>
-                <li>{{ _("Create an API key") }}</li>
-                <li>{{ _("Paste the id and secret below") }}</li>
+                <li>{{ _("Create an API token") }}</li>
+                <li>{{ _("Paste it in below") }}</li>
             </div>
         </div>
         <br/>
 
         <form method="post" class="card" align="center">
-            <div>{{ _("API client id:") }}</div>
-            <input type="text" name="client_id">
-            <br/>
-            <br/>
-            <div>{{ _("API client secret:") }}</div>
-            <input type="password" name="client_secret">
+            <input type="hidden" class="csrf-token" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div>{{ _("API token:") }}</div>
+            <input type="password" name="api_token">
             <br/>
             <br/>
             <br/>

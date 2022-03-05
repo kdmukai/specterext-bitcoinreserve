@@ -27,8 +27,7 @@ class BitcoinReserveService(Service):
     # ServiceEncryptedStorage field names for this service
     # Those will end up as keys in a json-file
     SPECTER_WALLET_ALIAS = "wallet"
-    API_CLIENT_ID = "client_id"
-    API_CLIENT_SECRET = "client_secret"
+    API_TOKEN = "api_token"
 
     # def callback_after_serverpy_init_app(self, scheduler: APScheduler):
     #     def every5seconds(hello, world="world"):
@@ -70,36 +69,29 @@ class BitcoinReserveService(Service):
 
 
     @classmethod
-    def set_api_credentials(cls, user: User, client_id: str, client_secret: str):
+    def set_api_credentials(cls, user: User, api_token: str):
         cls.update_current_user_service_data(
             {
-                BitcoinReserveService.API_CLIENT_ID: client_id,
-                BitcoinReserveService.API_CLIENT_SECRET: client_secret,
+                BitcoinReserveService.API_TOKEN: api_token,
             }
         )
         user.add_service(BitcoinReserveService.id)
 
     @classmethod
-    def get_api_credentials(cls, client_id: str, client_secret: str) -> dict:
+    def get_api_credentials(cls) -> dict:
         service_data = cls.get_current_user_service_data()
-        if (
-            not BitcoinReserveService.API_CLIENT_ID in service_data
-            or BitcoinReserveService.API_CLIENT_SECRET not in service_data
-        ):
+        if BitcoinReserveService.API_TOKEN not in service_data:
             return {}
 
         return {
-            "client_id": service_data.get(BitcoinReserveService.API_CLIENT_ID),
-            "client_secret": service_data.get(BitcoinReserveService.API_CLIENT_SECRET),
+            "api_token": service_data.get(BitcoinReserveService.API_TOKEN),
         }
 
     @classmethod
     def remove_api_credentials(cls, user: User):
         service_data = cls.get_current_user_service_data()
-        if BitcoinReserveService.API_CLIENT_ID in service_data:
-            del service_data[BitcoinReserveService.API_CLIENT_ID]
-        if BitcoinReserveService.API_CLIENT_SECRET in service_data:
-            del service_data[BitcoinReserveService.API_CLIENT_SECRET]
+        if BitcoinReserveService.API_TOKEN in service_data:
+            del service_data[BitcoinReserveService.API_TOKEN]
         cls.set_current_user_service_data(service_data)
         user.remove_service(BitcoinReserveService.id)
 
@@ -110,8 +102,8 @@ class BitcoinReserveService(Service):
     @classmethod
     def update(cls):
         from . import client as bitcoinreserve_client
-
-        results = bitcoinreserve_client.get_orders()
+        results = bitcoinreserve_client.get_transactions()
+        # TODO...
 
     @classmethod
     def on_user_login(cls):

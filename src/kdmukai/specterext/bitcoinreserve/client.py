@@ -3,7 +3,7 @@ import logging
 import requests
 
 from decimal import Decimal
-from flask import app
+from flask import current_app as app
 from werkzeug.wrappers import auth
 
 from kdmukai.specterext.bitcoinreserve.service import BitcoinReserveService
@@ -21,21 +21,28 @@ def authenticated_request(
 ) -> dict:
     logger.debug(f"{method} endpoint: {endpoint}")
 
-    api_keys = BitcoinReserveService.get_api_credentials()
+    api_token = BitcoinReserveService.get_api_credentials().get("api_token")
 
     # Must explicitly set User-Agent; Swan firewall blocks all requests with "python".
     auth_header = {
         "User-Agent": "Specter Desktop",
+        "Authorization": "Token " + api_token,
     }
+
+    url = url=app.config.get("BITCOIN_RESERVE_API_URL") + endpoint
+    logger.debug(url)
+    logger.debug(auth_header)
+
     try:
         response = requests.request(
             method=method,
-            url=app.config.get("BITCOIN_RESERVE_API_URL") + endpoint,
+            url=url,
             headers=auth_header,
             json=json_payload,
         )
         if response.status_code != 200:
             raise BitcoinReserveApiException(f"{response.status_code}: {response.text}")
+        print(json.dumps(response.json(), indent=4))
         return response.json()
     except Exception as e:
         # TODO: tighten up expected Exceptions
@@ -270,5 +277,5 @@ OUTPUT:
 """
 
 
-def get_orders():
-    return authenticated_request("/user/orders")
+def get_transactions(page_num: int = 0):
+    return authenticated_request(f"/api/user/transactions/{page_num}")
