@@ -3,18 +3,19 @@ import logging
 from cryptoadvance.specter.services.service import Service, devstatus_alpha, devstatus_prod
 # A SpecterError can be raised and will be shown to the user as a red banner
 from cryptoadvance.specter.specter_error import SpecterError
-from flask import current_app as app
+from cryptoadvance.specter.user import User
 from cryptoadvance.specter.wallet import Wallet
+from flask import current_app as app
 # from flask_apscheduler import APScheduler
 
 logger = logging.getLogger(__name__)
 
-class BitcoinreserveService(Service):
+class BitcoinReserveService(Service):
     id = "bitcoinreserve"
-    name = "Bitcoinreserve Service"
-    icon = "bitcoinreserve/img/ghost.png"
-    logo = "bitcoinreserve/img/logo.jpeg"
-    desc = "Where a bitcoinreserve grows bigger."
+    name = "Bitcoin Reserve"
+    icon = "bitcoinreserve/img/bitcoinreserve_icon.svg"
+    logo = "bitcoinreserve/img/logo-light.svg"
+    desc = "Where Europe buys Bitcoin"
     has_blueprint = True
     blueprint_module = "kdmukai.specterext.bitcoinreserve.controller"
     devstatus = devstatus_alpha
@@ -26,6 +27,8 @@ class BitcoinreserveService(Service):
     # ServiceEncryptedStorage field names for this service
     # Those will end up as keys in a json-file
     SPECTER_WALLET_ALIAS = "wallet"
+    API_CLIENT_ID = "client_id"
+    API_CLIENT_SECRET = "client_secret"
 
     # def callback_after_serverpy_init_app(self, scheduler: APScheduler):
     #     def every5seconds(hello, world="world"):
@@ -47,12 +50,12 @@ class BitcoinreserveService(Service):
     def get_associated_wallet(cls) -> Wallet:
         """Get the Specter `Wallet` that is currently associated with this service"""
         service_data = cls.get_current_user_service_data()
-        if not service_data or cls.SPECTER_WALLET_ALIAS not in service_data:
+        if not service_data or BitcoinReserveService.SPECTER_WALLET_ALIAS not in service_data:
             # Service is not initialized; nothing to do
             return
         try:
             return app.specter.wallet_manager.get_by_alias(
-                service_data[cls.SPECTER_WALLET_ALIAS]
+                service_data[BitcoinReserveService.SPECTER_WALLET_ALIAS]
             )
         except SpecterError as e:
             logger.debug(e)
@@ -63,4 +66,53 @@ class BitcoinreserveService(Service):
     @classmethod
     def set_associated_wallet(cls, wallet: Wallet):
         """Set the Specter `Wallet` that is currently associated with this Service"""
-        cls.update_current_user_service_data({cls.SPECTER_WALLET_ALIAS: wallet.alias})
+        cls.update_current_user_service_data({BitcoinReserveService.SPECTER_WALLET_ALIAS: wallet.alias})
+
+
+    @classmethod
+    def set_api_credentials(cls, user: User, client_id: str, client_secret: str):
+        cls.update_current_user_service_data(
+            {
+                BitcoinReserveService.API_CLIENT_ID: client_id,
+                BitcoinReserveService.API_CLIENT_SECRET: client_secret,
+            }
+        )
+        user.add_service(BitcoinReserveService.id)
+
+    @classmethod
+    def get_api_credentials(cls, client_id: str, client_secret: str) -> dict:
+        service_data = cls.get_current_user_service_data()
+        if (
+            not BitcoinReserveService.API_CLIENT_ID in service_data
+            or BitcoinReserveService.API_CLIENT_SECRET not in service_data
+        ):
+            return {}
+
+        return {
+            "client_id": service_data.get(BitcoinReserveService.API_CLIENT_ID),
+            "client_secret": service_data.get(BitcoinReserveService.API_CLIENT_SECRET),
+        }
+
+    @classmethod
+    def remove_api_credentials(cls, user: User):
+        service_data = cls.get_current_user_service_data()
+        if BitcoinReserveService.API_CLIENT_ID in service_data:
+            del service_data[BitcoinReserveService.API_CLIENT_ID]
+        if BitcoinReserveService.API_CLIENT_SECRET in service_data:
+            del service_data[BitcoinReserveService.API_CLIENT_SECRET]
+        cls.set_current_user_service_data(service_data)
+        user.remove_service(BitcoinReserveService.id)
+
+    @classmethod
+    def has_api_credentials(cls) -> bool:
+        return BitcoinReserveService.get_api_credentials() != {}
+
+    @classmethod
+    def update(cls):
+        from . import client as bitcoinreserve_client
+
+        results = bitcoinreserve_client.get_orders()
+
+    @classmethod
+    def on_user_login(cls):
+        cls.update()

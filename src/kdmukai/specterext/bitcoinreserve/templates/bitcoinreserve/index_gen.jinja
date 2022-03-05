@@ -1,9 +1,9 @@
-{% extends "base.jinja" %}
-
-{% block main %}
+{% extends "bitcoinreserve/components/bitcoinreserve_tab.jinja" %}
+{% block title %}Settings{% endblock %}
+{% set tab = 'index' %}
+{% block content %}
     <style>
         .tagline {
-            margin-top: 0.5em;
             font-style: italic;
             font-size: 1.1em;
             text-align: center;
@@ -72,37 +72,11 @@
         .plus_sign {
             font-size: 3em;
             color: #ccc;
-            position: relative;
-            top: -0.25em;
+            vertical-align: text-bottom;
         }
     </style>
-    <img src="{{ url_for(service.id +'_endpoint' + '.static', filename=service.logo) }}" height="60"/>
-    <div class="tagline">&ldquo;{{ _("The first bitcoin-only venue in Europe that allows daily purchases over €1,000") }}&rdquo;</div>
-    <div class="card center" style="width: auto; min-width: 90%; margin: 40px;">
-        <a class="button_wide" href="https://www.bitcoinreserve.com/Specter/" target="_swan">
-            <span class="big_option">
-                <div class="big_option_text">
-                    {{ _("Join Bitcoin Reserve!") }}
-                </div>
-            </span>
-        </a>
-        <span class="big_option" onclick="location.href='{{ url_for(service.id +'_endpoint.set_api_key') }}';">
-            <div class="big_option_text">
-                {{ _("Existing&nbsp;users") }}
-            </div>
-        </span>
-
-        <div class="highlights">
-            <img src="{{ url_for(service.id +'_endpoint' + '.static', filename=service.icon) }}" width="50"/>
-            <span class="plus_sign">+</span>
-            <img src="{{ url_for('static', filename='img/ghost_3d.png') }}" height="50"/><br/>
-            <div class="show_list_bullet">
-                <li>{{ _("Flash buy straight into your Specter wallet") }}
-                <li>{{ _("Check fiat balance") }}
-                <li>{{ _("Bitcoin Reserve UTXOs marked in your Specter History") }}
-            </div>
-        </div>
-    </div>
+    <br><br>
+    <div class="tagline">&ldquo; BitcoinreserveService 4thewin.&rdquo;</div>
 {% endblock %}
 
 

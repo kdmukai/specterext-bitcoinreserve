@@ -7,11 +7,11 @@ from cryptoadvance.specter.config import ProductionConfig as SpecterProductionCo
 
 class BaseConfig:
     ''' This is a extension-based Config which is used as Base '''
-    BITCOINRESERVE_SOMEKEY = "some value"
+    BITCOIN_RESERVE_API_URL = "http://46.101.227.39/"
 
 class ProductionConfig(BaseConfig):
     ''' This is a extension-based Config for Production '''
-    pass
+    BITCOIN_RESERVE_API_URL = ""
 
 
 class AppProductionConfig(SpecterProductionConfig):
