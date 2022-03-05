@@ -1,0 +1,8 @@
+{% extends "bitcoinreserve/base.jinja" %}
+{% block main %}
+    <img src="{{ url_for(service.id +'_endpoint' + '.static', filename=service.logo) }}" width="300"/>    
+    {% from 'bitcoinreserve/components/bitcoinreserve_menu.jinja' import bitcoinreserve_menu with context %}
+    {{ bitcoinreserve_menu(tab) }}
+    {% block content %}
+    {% endblock %}
+{% endblock %}

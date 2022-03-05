@@ -1,0 +1,5 @@
+recursive-include src/kdmukai/specterext/bitcoinreserve/templates *
+recursive-include src/kdmukai/specterext/bitcoinreserve/static *
+recursive-include src/kdmukai/specterext/bitcoinreserve/*/LC_MESSAGES *.mo
+recursive-include src/kdmukai/specterext/bitcoinreserve/translations/*/LC_MESSAGES *.po
+include requirements.txt
