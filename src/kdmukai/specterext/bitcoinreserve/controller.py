@@ -50,6 +50,9 @@ def api_key_required(func):
 @login_required
 @user_secret_decrypted_required
 def index():
+    if BitcoinReserveService.get_api_credentials():
+        return redirect(url_for(f"{BitcoinReserveService.get_blueprint_name()}.transactions"))
+
     return render_template(
         "bitcoinreserve/index.jinja",
     )

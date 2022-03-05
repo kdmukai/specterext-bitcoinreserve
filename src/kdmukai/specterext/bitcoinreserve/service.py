@@ -1,3 +1,5 @@
+import datetime
+import json
 import logging
 
 from cryptoadvance.specter.services.service import Service, devstatus_alpha, devstatus_prod
@@ -28,6 +30,7 @@ class BitcoinReserveService(Service):
     # Those will end up as keys in a json-file
     SPECTER_WALLET_ALIAS = "wallet"
     API_TOKEN = "api_token"
+    LAST_TRANSACTION_TIME = "last_transaction_time"
 
     # def callback_after_serverpy_init_app(self, scheduler: APScheduler):
     #     def every5seconds(hello, world="world"):
@@ -102,8 +105,47 @@ class BitcoinReserveService(Service):
     @classmethod
     def update(cls):
         from . import client as bitcoinreserve_client
-        results = bitcoinreserve_client.get_transactions()
-        # TODO...
+        transactions = bitcoinreserve_client.get_transactions()
+
+        # The first entry is the summary data:
+        """
+            {
+                "total_transaction_count": 29,
+                "page": 0
+            },
+            {
+                "transaction_id": "1f88faf0-dfc4-410e-9163-7371f9aa9e30",
+                "transaction_status": "DONE",
+                "transaction_type": "WITHDRAWAL",
+                "transaction_time": "2022-01-18 05:28:35.068650",
+                "in_currency": null,
+                "in_amount": "None",
+                "out_currency": "SATS",
+                "out_amount": "28838.00000000"
+            }
+        """
+        last_transaction_time = BitcoinReserveService.get_current_user_service_data().get(BitcoinReserveService.LAST_TRANSACTION_TIME)
+        print(f"last_transaction_time: {last_transaction_time}")
+        new_last_transaction_time = datetime.datetime(2000, 1, 1).timestamp()
+        for index, tx in enumerate(transactions):
+            if index == 0:
+                print(f"""total_transaction_count: {tx.get("total_transaction_count")}""")
+                continue
+
+            transaction_time = datetime.datetime.strptime(tx.get("transaction_time"), "%Y-%m-%d %H:%M:%S.%f").timestamp()
+            print(f"transaction_time: {transaction_time}")
+
+            if not last_transaction_time or transaction_time > last_transaction_time:
+                details = bitcoinreserve_client.get_transaction(tx.get("transaction_id"))
+                print(json.dumps(details, indent=4))
+                new_last_transaction_time = max(new_last_transaction_time, transaction_time)
+                print(f"new_last_transaction_time: {new_last_transaction_time}")
+        
+        if new_last_transaction_time > last_transaction_time:
+            # Update our service_data to mark these transactions as already scanned
+            BitcoinReserveService.update_current_user_service_data({
+                BitcoinReserveService.LAST_TRANSACTION_TIME: new_last_transaction_time
+            })
 
     @classmethod
     def on_user_login(cls):

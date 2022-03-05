@@ -155,127 +155,49 @@ def get_order_status(order_id: str):
     )
 
 
-"""
-"Order History": /user/orders/
-EXAMPLE:
-curl -X GET http://46.101.227.39/user/orders/
-OUTPUT:
-[
-    {
-        "order_id": "ff651131-7934-4833-be5a-0f7a0b7b4b5e",
-        "order_status": "COMPLETE",
-        "quote_id": "67dcd074-d462-48e5-a38f-25568af17a4d",
-        "trade_fee_currency": "EUR",
-        "trade_fee_amount": 30.0,
-        "withdrawals": {
-            "withdrawal_number": 0,
-            "withdrawal_status": "INITIATED",
-            "withdrawal_address": "bc1qjg53lww9jrm506dj0g0szmk4pxt6f55x8dncuv",
-            "withdrawal_method": "ONCHAIN",
-            "withdrawal_fee": 0.0,
-            "withdrawal_eta": 1641580420.89475,
-            "withdrawal_identifier": null
-        }
-    },
-    {
-        "order_id": "c1f13466-a58f-4df1-b76a-45a59136675b",
-        "order_status": "COMPLETE",
-        "quote_id": "0d610e67-3090-4ed4-ba6f-a42f5e63ec15",
-        "trade_fee_currency": "EUR",
-        "trade_fee_amount": 15.0,
-        "withdrawals": {
-            "withdrawal_number": 0,
-            "withdrawal_status": "INITIATED",
-            "withdrawal_address": "3NUNxvYdD3ifmMuVLF3uhVAx977GrHykUc",
-            "withdrawal_method": "ONCHAIN",
-            "withdrawal_fee": 0.0,
-            "withdrawal_eta": 1641580580.193506,
-            "withdrawal_identifier": "94a9e6d5b08435e0bb04cc94847812970749f40d909e5c83d29097559bd320f8"
-        }
-    },
-    {
-        "order_id": "f46b47fe-7164-4623-8d04-77ce9086c1f6",
-        "order_status": "COMPLETE",
-        "quote_id": "003e6246-2ef4-42ed-805e-38788aac9ce5",
-        "trade_fee_currency": "EUR",
-        "trade_fee_amount": 234.0,
-        "withdrawals": {
-            "withdrawal_number": 0,
-            "withdrawal_status": "INITIATED",
-            "withdrawal_address": "bc1qtt04zfgjxg7lpqhk9vk8hnmnwf88ucwww5arsd",
-            "withdrawal_method": "ONCHAIN",
-            "withdrawal_fee": 0.0,
-            "withdrawal_eta": 1641580711.972974,
-            "withdrawal_identifier": null
-        }
-    },
-    {
-        "order_id": "a19d417f-5607-4db9-8988-3f049768908f",
-        "order_status": "COMPLETE",
-        "quote_id": "886e9065-8c1a-4755-a846-4dc5348f69a1",
-        "trade_fee_currency": "EUR",
-        "trade_fee_amount": 149.5,
-        "withdrawals": {
-            "withdrawal_number": 0,
-            "withdrawal_status": "INITIATED",
-            "withdrawal_address": "bc1qjg53lww9jrm506dj0g0szmk4pxt6f55x8dncuv",
-            "withdrawal_method": "ONCHAIN",
-            "withdrawal_fee": 0.0,
-            "withdrawal_eta": 1641918044.398311,
-            "withdrawal_identifier": null
-        }
-    },
-    {
-        "order_id": "ada3b445-268f-4b19-8be9-1813d2049107",
-        "order_status": "COMPLETE",
-        "quote_id": "886e9065-8c1a-4755-a846-4dc5348f69a1",
-        "trade_fee_currency": "EUR",
-        "trade_fee_amount": 149.5,
-        "withdrawals": {
-            "withdrawal_number": 0,
-            "withdrawal_status": "INITIATED",
-            "withdrawal_address": "bc1qjg53lww9jrm506dj0g0szmk4pxt6f55x8dncuv",
-            "withdrawal_method": "ONCHAIN",
-            "withdrawal_fee": 0.0,
-            "withdrawal_eta": 1641918060.721925,
-            "withdrawal_identifier": null
-        }
-    },
-    {
-        "order_id": "39e70c45-429a-401d-a04f-7954b1e5763b",
-        "order_status": "COMPLETE",
-        "quote_id": "e80f9f82-d317-451e-9626-e95f4a3ef9d4",
-        "trade_fee_currency": "EUR",
-        "trade_fee_amount": 149.5,
-        "withdrawals": {
-            "withdrawal_number": 0,
-            "withdrawal_status": "INITIATED",
-            "withdrawal_address": "bc1qjg53lww9jrm506dj0g0szmk4pxt6f55x8dncuv",
-            "withdrawal_method": "ONCHAIN",
-            "withdrawal_fee": 0.0,
-            "withdrawal_eta": 1641918081.47717,
-            "withdrawal_identifier": null
-        }
-    },
-    {
-        "order_id": "64b25003-f86f-4efe-8f12-25e081997f94",
-        "order_status": "COMPLETE",
-        "quote_id": "9bf167ef-fe91-4aa0-84ae-4e776cb18964",
-        "trade_fee_currency": "EUR",
-        "trade_fee_amount": 232.5323,
-        "withdrawals": {
-            "withdrawal_number": 0,
-            "withdrawal_status": "INITIATED",
-            "withdrawal_address": "bc1qjg53lww9jrm506dj0g0szmk4pxt6f55x8dncuv",
-            "withdrawal_method": "ONCHAIN",
-            "withdrawal_fee": 0.0,
-            "withdrawal_eta": 1641926345.437326,
-            "withdrawal_identifier": null
-        }
-    }
-]
-"""
-
-
-def get_transactions(page_num: int = 0):
+def get_transactions(page_num: int = 0) -> list:
+    """
+        First entry is the summary data:
+        [
+            {
+                "total_transaction_count": 29,
+                "page": 0
+            },
+            {
+                "transaction_id": "1f88faf0-dfc4-410e-9163-7371f9aa9e30",
+                "transaction_status": "DONE",
+                "transaction_type": "WITHDRAWAL",
+                "transaction_time": "2022-01-18 05:28:35.068650",
+                "in_currency": null,
+                "in_amount": "None",
+                "out_currency": "SATS",
+                "out_amount": "28838.00000000"
+            },
+            {...},
+        ]
+    """
     return authenticated_request(f"/api/user/transactions/{page_num}")
+
+
+def get_transaction(transaction_id: str) -> dict:
+    """
+        {
+            "transaction_type": "MARKET BUY",
+            "transaction_id": "31ffc3b6-9b9f-41db-ad6d-b636b69ae63d",
+            "transaction_status": "COMPLETE",
+            "sats_bought": "147810",
+            "fiat_spent": "50.00",
+            "fiat_currency": "EUR",
+            "withdrawals": {
+                "transaction_type": "WITHDRAWAL",
+                "transaction_id": "a9ab0eca-eb9a-4e6e-a692-8531356dd674",
+                "withdrawal_serial_number": 0,
+                "withdrawal_status": "DONE",
+                "withdrawal_address": "bc1qsst0m3pn9adnl68wuhd9h727eu09rnn0nqes2u",
+                "withdrawal_fee": "0",
+                "withdrawal_currency": "SATS",
+                "withdrawal_identifier": "ab4be723b1b11334fde4317c54fad91d583a1570958f78a486a3d4b4d32d7bc1"
+            }
+        }
+    """
+    return authenticated_request(f"/api/user/transaction/{transaction_id}")
